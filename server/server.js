@@ -24,8 +24,11 @@ io.on('connection', (socket) => {
         if (!isRealString(params.name) || !isRealString(params.room)) {
             return callback('Name and room name are required');
         }
+        if (users.getUserByName(params.name)) {
+            return callback('Name is already taken. Please choose another.');
+        }
 
-        socket.join(params.room);
+        socket.join(params.room.toLowerCase());
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
 
@@ -35,10 +38,10 @@ io.on('connection', (socket) => {
         // socket.broadcast.emit -> socket.broadcast.to('The Office Fans').emit
         // socket.emit -> leave as is, targets specific user already
 
-        io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+        io.to(params.room.toLowerCase()).emit('updateUserList', users.getUserList(params.room.toLowerCase()));
 
         socket.emit ('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-        socket.broadcast.to(params.room).emit ('newMessage', generateMessage('Admin', `${params.name} has joined.`));
+        socket.broadcast.to(params.room.toLowerCase()).emit ('newMessage', generateMessage('Admin', `${params.name} has joined.`));
     
         callback();
     });
@@ -47,7 +50,7 @@ io.on('connection', (socket) => {
         var user = users.getUser(socket.id);
 
         if (user && isRealString(message.text)) {
-            io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+            io.to(user.room.toLowerCase()).emit('newMessage', generateMessage(user.name, message.text));
         }
         
         callback();
@@ -57,7 +60,7 @@ io.on('connection', (socket) => {
         var user = users.getUser(socket.id);
         
         if (user) {
-            io.to(user.room).emit ('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
+            io.to(user.room.toLowerCase()).emit ('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
         }
     });
 
@@ -65,8 +68,8 @@ io.on('connection', (socket) => {
         var user = users.removeUser(socket.id);
 
         if (user) {
-            io.to(user.room).emit('updateUserList', users.getUserList(user.room));
-            io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
+            io.to(user.room.toLowerCase()).emit('updateUserList', users.getUserList(user.room.toLowerCase()));
+            io.to(user.room.toLowerCase()).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
         }
     });
 
@@ -79,3 +82,9 @@ server.listen(port, () => {
 });
 
 module.exports = {app};
+
+// IDEAS FOR ADDITION
+// ------------------
+// x make chat rooms case insensitive
+// make usernames unique - reject duplicates
+// add a list of currently active chat rooms
