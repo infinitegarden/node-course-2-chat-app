@@ -19,18 +19,28 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
     console.log('New user connected');
 
+    socket.on('load-join', (params, callback) => {
+        io.emit('updateRoomList', users.getRoomList());
+    });
  
-    socket.on('join', (params, callback) => {
-        if (!isRealString(params.name) || !isRealString(params.room)) {
+    socket.on('join', (params, callback) => {       
+        var room;
+        if (isRealString(params.newRoom)) {
+            room = params.newRoom;
+        } else {
+            room = params.existingRoom;
+        }
+
+        if (!isRealString(params.name) || !isRealString(room)) {
             return callback('Name and room name are required');
         }
         if (users.getUserByName(params.name)) {
             return callback('Name is already taken. Please choose another.');
         }
 
-        socket.join(params.room.toLowerCase());
+        socket.join(room.toLowerCase());
         users.removeUser(socket.id);
-        users.addUser(socket.id, params.name, params.room);
+        users.addUser(socket.id, params.name, room);
 
         // socket.leave('The Office Fans');
 
@@ -38,10 +48,11 @@ io.on('connection', (socket) => {
         // socket.broadcast.emit -> socket.broadcast.to('The Office Fans').emit
         // socket.emit -> leave as is, targets specific user already
 
-        io.to(params.room.toLowerCase()).emit('updateUserList', users.getUserList(params.room.toLowerCase()));
+        io.to(room.toLowerCase()).emit('updateUserList', users.getUserList(room.toLowerCase()));
+        io.to(room.toLowerCase()).emit('setRoomName', room);
 
         socket.emit ('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-        socket.broadcast.to(params.room.toLowerCase()).emit ('newMessage', generateMessage('Admin', `${params.name} has joined.`));
+        socket.broadcast.to(room.toLowerCase()).emit ('newMessage', generateMessage('Admin', `${params.name} has joined.`));
     
         callback();
     });
@@ -86,5 +97,5 @@ module.exports = {app};
 // IDEAS FOR ADDITION
 // ------------------
 // x make chat rooms case insensitive
-// make usernames unique - reject duplicates
-// add a list of currently active chat rooms
+// x make usernames unique - reject duplicates
+// x add a list of currently active chat rooms

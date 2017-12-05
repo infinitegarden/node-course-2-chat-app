@@ -19,7 +19,7 @@ describe ('Users', () => {
         }, {
             id: '3',
             name: 'Julie',
-            room: 'Node Course'
+            room: 'node CoursE'
             
         }]
     });
@@ -77,9 +77,16 @@ describe ('Users', () => {
         
         expect (userList).toEqual(['Mike', 'Julie']);
     });
+
     it('should return names for React course', () => {
         var userList = users.getUserList('React Course');
         
         expect (userList).toEqual(['Jen']);
+    });
+
+    it('should return unique room names case-insensitive', () => {
+        var roomList = users.getRoomList();
+        console.log(roomList);
+        expect (roomList.length).toBe(2);
     });
 });

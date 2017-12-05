@@ -43,6 +43,14 @@ socket.on('updateUserList', function(users) {
     jQuery('#users').html(ol);
 });
 
+socket.on('setRoomName', function(roomName) {
+    if (!jQuery('#roomName').text()) {
+        var h3 = jQuery('<h3></h3>').text("Room:");
+        h3.append(jQuery('<p></p>').text(roomName));
+        jQuery('#roomName').html(h3);
+    }
+ });
+
 socket.on('newMessage', function(message) {
     var formattedTime = moment(message.createdAt).format('h:mm a');
     var template = jQuery('#message-template').html();
@@ -76,7 +84,6 @@ jQuery('#message-form').on('submit', function(e) {
     var messageTextbox = jQuery('[name=message]');
 
     socket.emit('createMessage', {
-        from: 'User',
         text: messageTextbox.val()
     }, function () {
         messageTextbox.val('');
@@ -103,3 +110,4 @@ locationButton.on('click', function() {
         alert('Unable to fetch location');
     });
 });
+

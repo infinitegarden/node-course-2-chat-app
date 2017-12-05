@@ -48,22 +48,27 @@ class Users {
         return namesArray;
     }
 
+    getRoomList() {
+        // var roomsArray = this.users.map((user) => user.room.toLowerCase());
+        var roomsArray = this.users.map((user) => user.room);
+        
+        // var uniqueRooms = Array.from(new Set(roomsArray));
+        var uniqueRooms = this.getUniqueArrayCaseInsensitive(roomsArray);
+        return uniqueRooms;
+    }
+
+    getUniqueArrayCaseInsensitive(inputArray) {
+        return inputArray.reduce((result, element) => {
+            var normalize = function(x) { return typeof x === 'string' ? x.toLowerCase() : x; };
+        
+            var normalizedElement = normalize(element);
+            if (result.every(otherElement => normalize(otherElement) !== normalizedElement))
+            result.push(element);
+        
+            return result;
+        }, []);
+    }
 
 }
 
 module.exports = {Users};
-
-// class Person {
-//     constructor (name, age) {
-//         this.name = name;
-//         this.age = age;
-//     }
-
-//     getUserDescription() {
-//         return `${this.name} is ${this.age} year(s) old.`;
-//     }
-// }
-
-// var me = new Person('mename', 23);
-// var description = me.getUserDescription();
-// console.log(description);

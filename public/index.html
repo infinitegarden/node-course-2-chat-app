@@ -17,13 +17,18 @@
                     <input type="text" name="name" autofocus />
                 </div>
                 <div class="form-field">
-                    <label>Room Name</label>
-                    <input type="text" name="room" />
+                    <label>New Room Name</label>
+                    <input type="text" id="newRoom" name="newRoom" onchange="clearValue('existingRoom')"/>
+                </div>
+                <div id="room-selector" class="form-field">
                 </div>
                 <div class="form-field">
                     <button>Join</button>
-                </div>
+                </div>       
             </form>
         </div>
+        <script src="/socket.io/socket.io.js"></script>        
+        <script src="/js/libs/jquery-3.2.1.min.js"></script>        
+        <script src="/js/index.js"></script>
     </body>
 </html>
