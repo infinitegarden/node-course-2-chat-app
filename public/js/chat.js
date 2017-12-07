@@ -46,6 +46,7 @@ socket.on('updateUserList', function(users) {
 socket.on('setRoomName', function(roomName) {
     if (!jQuery('#roomName').text()) {
         var h3 = jQuery('<h3></h3>').text("Room:");
+        //TODO: should this be the original room name or the updated one (case-wise) if it is an existing room?
         h3.append(jQuery('<p></p>').text(roomName));
         jQuery('#roomName').html(h3);
     }
